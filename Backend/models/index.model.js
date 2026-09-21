@@ -13,7 +13,6 @@ import ClassSection from './class-section.model.js';
 import Schedule from './schedule.model.js';
 import DemandRegistration from './demand-registration.model.js';
 import Enrollment from './enrollment.model.js';
-import Waitlist from './waitlist.model.js';
 import Grade from './grade.model.js';
 import StudentCertificate from './student-certificate.model.js';
 import GraduationAssessment from './graduation-assessment.model.js';
@@ -34,7 +33,6 @@ export {
     Schedule,
     DemandRegistration,
     Enrollment,
-    Waitlist,
     Grade,
     StudentCertificate,
     GraduationAssessment
@@ -56,7 +54,6 @@ export default {
     Schedule,
     DemandRegistration,
     Enrollment,
-    Waitlist,
     Grade,
     StudentCertificate,
     GraduationAssessment

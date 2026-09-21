@@ -33,7 +33,6 @@ export {
     Schedule,
     DemandRegistration,
     Enrollment,
-    Waitlist,
     Grade,
     StudentCertificate,
     GraduationAssessment
@@ -55,7 +54,6 @@ export default {
     Schedule,
     DemandRegistration,
     Enrollment,
-    Waitlist,
     Grade,
     StudentCertificate,
     GraduationAssessment

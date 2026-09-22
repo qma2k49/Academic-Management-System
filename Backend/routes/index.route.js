@@ -10,6 +10,7 @@ import studentRoutes from './student.route.js';
 import semesterRoutes from './semester.route.js';
 import roomRoutes from './room.route.js';
 import classSectionRoutes from './class-section.route.js';
+import scheduleRoutes from './schedule.route.js';
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.use('/students', studentRoutes);
 router.use('/semesters', semesterRoutes);
 router.use('/rooms', roomRoutes);
 router.use('/class-sections', classSectionRoutes);
+router.use('/schedules', scheduleRoutes);
 
 export default router;

@@ -137,7 +137,7 @@ export const createSchedule = async (req, res) => {
             });
         }
 
-        // Room Conflict Check (same room, same day_of_week, overlapping periods)
+        // AC 1: Room Conflict Check (same room, same day_of_week, overlapping periods)
         const roomConflict = await Schedule.findOne({
             room_id,
             day_of_week: parsedDay,
@@ -148,11 +148,11 @@ export const createSchedule = async (req, res) => {
         if (roomConflict) {
             return res.status(400).json({
                 success: false,
-                message: 'Phòng học bị trùng lịch với một lớp học phần khác trong cùng khung tiết này'
+                message: 'Phòng học đã bị trùng lịch'
             });
         }
 
-        // Lecturer Conflict Check (same lecturer, same day_of_week, overlapping periods)
+        // AC 2: Lecturer Conflict Check (same lecturer, same day_of_week, overlapping periods)
         const lecturerConflict = await Schedule.findOne({
             lecturer_id,
             day_of_week: parsedDay,
@@ -163,7 +163,7 @@ export const createSchedule = async (req, res) => {
         if (lecturerConflict) {
             return res.status(400).json({
                 success: false,
-                message: 'Giảng viên bị trùng lịch dạy một lớp học phần khác trong cùng khung tiết này'
+                message: 'Giảng viên đã có lịch giảng dạy trong khung giờ này'
             });
         }
 
@@ -248,7 +248,7 @@ export const updateSchedule = async (req, res) => {
         if (roomConflict) {
             return res.status(400).json({
                 success: false,
-                message: 'Phòng học bị trùng lịch với lớp học phần khác'
+                message: 'Phòng học đã bị trùng lịch'
             });
         }
 
@@ -264,7 +264,7 @@ export const updateSchedule = async (req, res) => {
         if (lecturerConflict) {
             return res.status(400).json({
                 success: false,
-                message: 'Giảng viên bị trùng lịch dạy với lớp học phần khác'
+                message: 'Giảng viên đã có lịch giảng dạy trong khung giờ này'
             });
         }
 

@@ -2,6 +2,7 @@ import Schedule from '../models/schedule.model.js';
 import ClassSection from '../models/class-section.model.js';
 import Lecturer from '../models/lecturer.model.js';
 import Room from '../models/room.model.js';
+import { performance } from 'perf_hooks';
 
 // Get all schedules (with filters for section_id, lecturer_id, room_id, day_of_week)
 export const getSchedules = async (req, res) => {
@@ -85,10 +86,10 @@ export const createSchedule = async (req, res) => {
         const parsedEnd = Number(end_period);
 
         // Validate day_of_week (2 = Thứ 2, 8 = Chủ Nhật)
-        if (isNaN(parsedDay) || parsedDay < 2 || parsedDay > 7) {
+        if (isNaN(parsedDay) || parsedDay < 2 || parsedDay > 8) {
             return res.status(400).json({
                 success: false,
-                message: 'Thứ trong tuần không hợp lệ (Chấp nhận giá trị từ 2 - Thứ 2 đến Thứ 7)'
+                message: 'Thứ trong tuần không hợp lệ (Chấp nhận giá trị từ 2 - Thứ 2 đến 8 - Chủ Nhật)'
             });
         }
 
@@ -222,7 +223,7 @@ export const updateSchedule = async (req, res) => {
         const targetRoom = room_id || schedule.room_id;
         const targetLecturer = lecturer_id || schedule.lecturer_id;
 
-        if (targetDay < 2 || targetDay > 7) {
+        if (targetDay < 2 || targetDay > 8) {
             return res.status(400).json({
                 success: false,
                 message: 'Thứ trong tuần không hợp lệ (Chấp nhận giá trị từ 2 - Thứ 2 đến 8 - Chủ Nhật)'
@@ -316,6 +317,111 @@ export const deleteSchedule = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Lỗi máy chủ khi xóa Thời khóa biểu',
+            error: error.message
+        });
+    }
+};
+
+// Get Schedule Matrix Grid (AC 1 & AC 2)
+export const getScheduleMatrix = async (req, res) => {
+    const startTime = performance.now();
+    try {
+        const { lecturer_id, room_id, day_of_week, semester_id } = req.query;
+
+        let query = {};
+        if (lecturer_id) query.lecturer_id = lecturer_id;
+        if (room_id) query.room_id = room_id;
+        if (day_of_week) query.day_of_week = Number(day_of_week);
+
+        // Retrieve schedules populated with details
+        let schedules = await Schedule.find(query)
+            .populate({
+                path: 'section_id',
+                select: 'section_code max_capacity current_enrolled status course_id semester_id',
+                populate: [
+                    { path: 'course_id', select: 'course_code course_name credits' },
+                    { path: 'semester_id', select: 'semester_code year_start year_end' }
+                ]
+            })
+            .populate('lecturer_id', 'lecturer_code full_name degree phone_number')
+            .populate('room_id', 'room_code capacity room_type');
+
+        // Optional filtering by semester_id if passed in query
+        if (semester_id) {
+            schedules = schedules.filter(s => 
+                s.section_id && 
+                s.section_id.semester_id && 
+                s.section_id.semester_id._id.toString() === semester_id
+            );
+        }
+
+        const days = [2, 3, 4, 5, 6, 7, 8];
+        const dayNames = {
+            2: 'Thứ 2',
+            3: 'Thứ 3',
+            4: 'Thứ 4',
+            5: 'Thứ 5',
+            6: 'Thứ 6',
+            7: 'Thứ 7',
+            8: 'Chủ Nhật'
+        };
+        const periods = Array.from({ length: 12 }, (_, i) => i + 1);
+
+        const matrix = days.map(day => {
+            const slots = periods.map(period => {
+                const matchingSchedule = schedules.find(s =>
+                    s.day_of_week === day &&
+                    period >= s.start_period &&
+                    period <= s.end_period
+                );
+
+                if (matchingSchedule) {
+                    return {
+                        period,
+                        status: 'BUSY',
+                        schedule: {
+                            _id: matchingSchedule._id,
+                            section_code: matchingSchedule.section_id?.section_code || '',
+                            course_code: matchingSchedule.section_id?.course_id?.course_code || '',
+                            course_name: matchingSchedule.section_id?.course_id?.course_name || '',
+                            lecturer_name: matchingSchedule.lecturer_id?.full_name || '',
+                            lecturer_code: matchingSchedule.lecturer_id?.lecturer_code || '',
+                            room_code: matchingSchedule.room_id?.room_code || '',
+                            start_period: matchingSchedule.start_period,
+                            end_period: matchingSchedule.end_period
+                        }
+                    };
+                } else {
+                    return {
+                        period,
+                        status: 'VACANT',
+                        schedule: null
+                    };
+                }
+            });
+
+            return {
+                day_of_week: day,
+                day_name: dayNames[day],
+                slots
+            };
+        });
+
+        const endTime = performance.now();
+        const processing_time_seconds = parseFloat(((endTime - startTime) / 1000).toFixed(4));
+
+        return res.status(200).json({
+            success: true,
+            processing_time_seconds,
+            data: {
+                matrix,
+                total_schedules: schedules.length
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Lỗi máy chủ khi lấy ma trận thời khóa biểu',
             error: error.message
         });
     }

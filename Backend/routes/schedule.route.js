@@ -1,6 +1,7 @@
 import express from 'express';
 import {
     getSchedules,
+    getScheduleMatrix,
     getScheduleById,
     createSchedule,
     updateSchedule,
@@ -11,6 +12,7 @@ import { verifyToken, authorizeRoles } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 router.get('/', verifyToken, getSchedules);
+router.get('/matrix', verifyToken, getScheduleMatrix);
 router.get('/:id', verifyToken, getScheduleById);
 
 // AC: Cán bộ giáo vụ (OFFICER) và ADMIN được phép Gán, Cập nhật, Xóa Thời khóa biểu

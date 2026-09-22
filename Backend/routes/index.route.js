@@ -7,6 +7,8 @@ import prerequisiteRoutes from './prerequisite.route.js';
 import curriculumCourseRoutes from './curriculum-course.route.js';
 import lecturerRoutes from './lecturer.route.js';
 import studentRoutes from './student.route.js';
+import semesterRoutes from './semester.route.js';
+import roomRoutes from './room.route.js';
 
 const router = express.Router();
 
@@ -18,5 +20,7 @@ router.use('/prerequisites', prerequisiteRoutes);
 router.use('/curriculum-courses', curriculumCourseRoutes);
 router.use('/lecturers', lecturerRoutes);
 router.use('/students', studentRoutes);
+router.use('/semesters', semesterRoutes);
+router.use('/rooms', roomRoutes);
 
 export default router;

@@ -5,6 +5,7 @@ import majorRoutes from './major.route.js';
 import courseRoutes from './course.route.js';
 import prerequisiteRoutes from './prerequisite.route.js';
 import curriculumCourseRoutes from './curriculum-course.route.js';
+import lecturerRoutes from './lecturer.route.js';
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use('/majors', majorRoutes);
 router.use('/courses', courseRoutes);
 router.use('/prerequisites', prerequisiteRoutes);
 router.use('/curriculum-courses', curriculumCourseRoutes);
+router.use('/lecturers', lecturerRoutes);
 
 export default router;

@@ -11,18 +11,13 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-save hook to hash password before saving if modified
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (!this.isModified('password_hash')) {
-        return next();
+        return;
     }
 
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password_hash = await bcrypt.hash(this.password_hash, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
+    const salt = await bcrypt.genSalt(10);
+    this.password_hash = await bcrypt.hash(this.password_hash, salt);
 });
 
 // Helper method to compare password

@@ -9,6 +9,7 @@ import lecturerRoutes from './lecturer.route.js';
 import studentRoutes from './student.route.js';
 import semesterRoutes from './semester.route.js';
 import roomRoutes from './room.route.js';
+import classSectionRoutes from './class-section.route.js';
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use('/lecturers', lecturerRoutes);
 router.use('/students', studentRoutes);
 router.use('/semesters', semesterRoutes);
 router.use('/rooms', roomRoutes);
+router.use('/class-sections', classSectionRoutes);
 
 export default router;
